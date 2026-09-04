@@ -2,7 +2,7 @@
   "name": "actionscope-action",
   "version": "0.1.0",
   "private": true,
-  "description": "Estimate GitHub Actions minute usage for the current workflow run",
+  "description": "See where your GitHub Actions minutes go. Estimate billable minutes by job and OS.",
   "main": "index.js",
   "engines": {
     "node": ">=20"

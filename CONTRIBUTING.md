@@ -1,26 +1,30 @@
 # Contributing
 
-Actionscope is at v0: a small GitHub Action that posts a Job Summary. Keep changes lean. No auth, billing, or Marketplace App in this pass.
+Actionscope v0.1 is a small GitHub Action that posts a Job Summary. Keep changes lean. No GitHub App, Stripe charges, or org dashboard in this repo.
+
+The Actions Marketplace listing is **free-only**. Paid pilots ($49 / org) and seats ($19) belong to the App track — see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
 
 ## Layout
 
 ```
-action/                 # the reusable Action
+action.yml              # Marketplace + uses: Sofa-Loaf/actionscope@vX
+action/                 # shared runtime (also uses: .../action@vX)
   action.yml
   index.js              # GitHub runtime: API + summary
   estimate.js           # pure estimate + markdown
   estimate.test.js
+docs/GO_TO_MARKET.md
 .github/workflows/demo.yml
 ```
 
+Root `action.yml` and `action/action.yml` must stay aligned (name, description, branding, inputs, outputs, `runs.using`). Only `runs.main` differs (`action/index.js` vs `index.js`).
+
 ## Develop
 
-Requires Node 20+ locally. The Action runtime on GitHub is Node 24. No npm install — no dependencies.
+Requires Node 20+ locally. The GitHub-hosted runtime is **Node 24** (`runs.using: node24`). No npm install — the Action has no dependencies.
 
 ```bash
 node action/estimate.test.js
-# or
-node --test-reporter=spec -e "require('./action/estimate.test.js')"
 ```
 
 `package.json` in `action/` exposes the same check as `npm test` if you `cd action`.
@@ -43,4 +47,4 @@ GITHUB_WORKFLOW=local GITHUB_JOB=dev node action/index.js
 
 ## What not to add yet
 
-OAuth, a GitHub App, dollar invoices, org dashboards, or Marketplace packaging. Those are the paid App track.
+OAuth, a GitHub App, live Stripe webhooks, dollar invoices, or org dashboards. Those are the paid App track. Do not put paid Marketplace metadata on the Action listing.
