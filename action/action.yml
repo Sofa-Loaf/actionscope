@@ -20,5 +20,5 @@ outputs:
     description: Sum of observed wall-clock seconds across those jobs
 
 runs:
-  using: node20
+  using: node24
   main: index.js

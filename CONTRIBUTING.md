@@ -15,7 +15,7 @@ action/                 # the reusable Action
 
 ## Develop
 
-Requires Node 20+. No npm install — the Action has no dependencies.
+Requires Node 20+ locally. The Action runtime on GitHub is Node 24. No npm install — no dependencies.
 
 ```bash
 node action/estimate.test.js
