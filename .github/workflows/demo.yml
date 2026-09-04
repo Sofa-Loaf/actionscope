@@ -1,0 +1,49 @@
+name: Actionscope demo
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run estimate tests
+        run: node action/estimate.test.js
+
+  build:
+    name: Fake build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pretend to compile
+        run: sleep 8
+
+  test:
+    name: Fake test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pretend to test
+        run: sleep 5
+
+  estimate:
+    name: Actionscope estimate
+    needs: [unit, build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Estimate Actions minutes
+        id: scope
+        uses: ./action
+      - name: Show outputs
+        run: |
+          echo "estimated-minutes=${{ steps.scope.outputs.estimated-minutes }}"
+          echo "job-count=${{ steps.scope.outputs.job-count }}"
+          echo "wall-seconds=${{ steps.scope.outputs.wall-seconds }}"
