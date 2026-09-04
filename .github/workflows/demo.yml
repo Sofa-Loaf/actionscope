@@ -18,6 +18,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run estimate tests
         run: node action/estimate.test.js
+      - name: Root action.yml is Marketplace-ready
+        run: |
+          test -f action.yml
+          grep -q 'name: Actionscope' action.yml
+          grep -q 'icon: activity' action.yml
+          grep -q 'color: blue' action.yml
+          grep -q 'using: node24' action.yml
+          grep -q 'main: action/index.js' action.yml
 
   build:
     name: Fake build
@@ -41,6 +49,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Estimate Actions minutes
         id: scope
+        uses: ./
+      - name: Nested path still works
         uses: ./action
       - name: Show outputs
         run: |

@@ -1,5 +1,5 @@
-# Nested path kept for uses: Sofa-Loaf/actionscope/action@v0.1.0 and local ./action.
-# Publish the Marketplace listing from the root action.yml (GitHub requires it).
+# Marketplace listing requires action.yml at the repository root.
+# Runtime is the shared implementation in action/ (same logic as uses: ./action).
 name: Actionscope
 description: >-
   See where your GitHub Actions minutes go. Estimate billable minutes by job
@@ -25,4 +25,4 @@ outputs:
 
 runs:
   using: node24
-  main: index.js
+  main: action/index.js
