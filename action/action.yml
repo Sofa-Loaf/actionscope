@@ -1,0 +1,24 @@
+name: Actionscope
+description: Estimate GitHub Actions minute usage for the current workflow run and post a Job Summary
+author: Actionscope
+branding:
+  icon: activity
+  color: blue
+
+inputs:
+  github-token:
+    description: Token used to read jobs for this workflow run. Defaults to the workflow GITHUB_TOKEN.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  estimated-minutes:
+    description: Estimated quota-equivalent billable minutes for jobs visible in this run
+  job-count:
+    description: Number of jobs included in the estimate
+  wall-seconds:
+    description: Sum of observed wall-clock seconds across those jobs
+
+runs:
+  using: node20
+  main: index.js

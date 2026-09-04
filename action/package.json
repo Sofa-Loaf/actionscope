@@ -1,0 +1,13 @@
+{
+  "name": "actionscope-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Estimate GitHub Actions minute usage for the current workflow run",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node estimate.test.js"
+  }
+}
