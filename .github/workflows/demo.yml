@@ -21,7 +21,7 @@ jobs:
       - name: Root action.yml is Marketplace-ready
         run: |
           test -f action.yml
-          grep -q 'name: Actionscope' action.yml
+          grep -q 'name: 28to3-actionscope' action.yml
           grep -q 'icon: activity' action.yml
           grep -q 'color: blue' action.yml
           grep -q 'using: node24' action.yml

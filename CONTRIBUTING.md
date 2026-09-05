@@ -17,7 +17,7 @@ docs/GO_TO_MARKET.md
 .github/workflows/demo.yml
 ```
 
-Root `action.yml` and `action/action.yml` must stay aligned (name, description, branding, inputs, outputs, `runs.using`). Only `runs.main` differs (`action/index.js` vs `index.js`).
+Root `action.yml` and `action/action.yml` must stay aligned (name, description, branding, inputs, outputs, `runs.using`). Only `runs.main` differs (`action/index.js` vs `index.js`). Marketplace listing `name` is **28to3-actionscope** (product brand stays Actionscope; `Actionscope` is not unique on Marketplace).
 
 ## Develop
 

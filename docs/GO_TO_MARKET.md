@@ -63,9 +63,9 @@ GitHub does not list an Action from a tag or API release alone. An owner with 2F
 3. Use the banner **Publish this Action to GitHub Marketplace** (or **Draft a release** from that banner).
 4. Accept the **GitHub Marketplace Developer Agreement** if prompted (repo owner or org owner).
 5. Check **Publish this Action to the GitHub Marketplace**.
-6. Keep the listing name **Actionscope** (must stay unique vs other Marketplace actions, users, orgs, and reserved feature names).
+6. Use listing name **28to3-actionscope** (must stay unique vs other Marketplace actions, users, orgs, and reserved feature names). Product brand stays Actionscope.
 7. Pick a primary category such as **Continuous integration**. Optional second: **Reporting** or **Project management**.
-8. Point the release at tag **`v0.1.0`** if GitHub offers the existing tag; otherwise cut a follow-up tag (for example `v0.1.1`) with the same notes. Marketplace publish requires a tagged release and 2FA.
+8. Point the release at tag **`v0.1.1`** (the unique listing name). Marketplace publish requires a tagged release and 2FA.
 9. Click **Publish release**.
 
 Do **not** mark the Action listing as paid. Leave billing, seats, and Stripe on the App/pilot track.
@@ -76,7 +76,7 @@ Do **not** mark the Action listing as paid. Leave billing, seats, and Stripe on 
 - [x] Nested `action/action.yml` still runnable
 - [x] README install path `uses: Sofa-Loaf/actionscope@v0.1.0`
 - [ ] CI green on the ship PR; merge to `main`
-- [ ] GitHub Release **v0.1.0** on `main`
+- [ ] GitHub Release **v0.1.1** on `main` (listing name `28to3-actionscope`)
 - [ ] Maintainer Marketplace publish clicks (above)
 - [x] Live $49 Actionscope Org Pilot Stripe Payment Link
 - [ ] GitHub App + $19/seat billing (later)
