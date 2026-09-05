@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   actions: read
+  pull-requests: write
 
 jobs:
   unit:
@@ -26,7 +27,10 @@ jobs:
           grep -q 'color: blue' action.yml
           grep -q 'using: node24' action.yml
           grep -q 'main: action/index.js' action.yml
-          ! grep -n 'buy.stripe.com' README.md CONTRIBUTING.md docs/GO_TO_MARKET.md action.yml action/action.yml action/estimate.js action/index.js
+          grep -q 'comment-on-pr' action.yml action/action.yml
+          grep -q 'estimated-usd' action.yml action/action.yml
+          ! grep -n 'buy.stripe.com' README.md CONTRIBUTING.md CHANGELOG.md docs/GO_TO_MARKET.md action.yml action/action.yml action/estimate.js action/index.js
+          ! grep -n 'org pilot' action.yml action/action.yml action/estimate.js action/index.js
 
   build:
     name: Fake build
@@ -51,10 +55,14 @@ jobs:
       - name: Estimate Actions minutes
         id: scope
         uses: ./
+        with:
+          comment-on-pr: true
       - name: Nested path still works
         uses: ./action
       - name: Show outputs
         run: |
           echo "estimated-minutes=${{ steps.scope.outputs.estimated-minutes }}"
+          echo "rounded-minutes=${{ steps.scope.outputs.rounded-minutes }}"
+          echo "estimated-usd=${{ steps.scope.outputs.estimated-usd }}"
           echo "job-count=${{ steps.scope.outputs.job-count }}"
           echo "wall-seconds=${{ steps.scope.outputs.wall-seconds }}"

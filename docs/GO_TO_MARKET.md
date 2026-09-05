@@ -8,7 +8,7 @@ The Actions Marketplace listing is **free-only**. Do not attach paid SKUs, licen
 
 | Product | Who pays | What they get | Price |
 | --- | --- | --- | --- |
-| **Actionscope Action** | Nobody | Per-run Job Summary: jobs, durations, quota-equivalent minutes | Free (Marketplace) |
+| **Actionscope Action** | Nobody | Per-run Job Summary: wall time, rounded minutes, SKU, list-price $, included-minute burn | Free (Marketplace) |
 | **Org pilot** | One engineering/FinOps buyer | Hands-on org attribution before the App is generally available | **$49 / org** (pilot) |
 | **Seat** | Same buyer, after pilot | Org dashboard access for people who need history, trends, and alerts | **$19 / seat** |
 
@@ -22,9 +22,9 @@ The $19/seat plan is not sold through the Action; it ships with the GitHub App. 
 
 **One line:** See where your GitHub Actions minutes go.
 
-**Problem:** The invoice (or monthly quota) is a lump sum. A 12-second job still burns a full minute. macOS can consume **10×** Linux. Teams find out after finance asks.
+**Problem:** The invoice (or monthly quota) is a lump sum. A 12-second job still burns a full minute. macOS list price is an order of magnitude above Linux. Teams find out after finance asks.
 
-**Free Action:** Attribute **this run** before anyone leaves the workflow. The Job Summary footer points at [28to3.me](https://28to3.me).
+**Free Action:** Attribute **this run** before anyone leaves the workflow. The Job Summary is paste-next-to-usage-report (SKU, rounded minutes, $). The footer points at [28to3.me](https://28to3.me). Do not sell vague pilots in Action copy.
 
 **Paid App (later):** History, “this workflow costs X / month”, budgets, and org roll-up. That is the profit motion — not a paid Marketplace Action.
 
@@ -37,21 +37,21 @@ Skip public-repo hobby lint jobs. Those are usually not billed the same way.
 ## Channels
 
 1. **GitHub Marketplace (Action)** — discovery for the free step. Listing must use the **root** `action.yml`.
-2. **README + Job Summary** — every run is a demo; the summary invites an org pilot via [28to3.me](https://28to3.me).
-3. **Website** — org pilot and learn-more live on [28to3.me](https://28to3.me). Checkout stays on the site, not in this repo.
+2. **README + Job Summary** — every run is a demo; the summary points at [28to3.me](https://28to3.me) for org-level reports. Optional `comment-on-pr` is screenshot-forwardable.
+3. **Website** — org-level product and checkout live on [28to3.me](https://28to3.me). Checkout stays on the site, not in this repo.
 4. **GitHub App Marketplace (later)** — paid listing when the App exists. Separate from the Action listing.
 
 ## Install (what we publish)
 
 ```yaml
 - name: Actionscope
-  uses: Sofa-Loaf/actionscope@v0.1.0
+  uses: Sofa-Loaf/actionscope@v0.1.3
 ```
 
 The nested path still works if someone already pinned it:
 
 ```yaml
-- uses: Sofa-Loaf/actionscope/action@v0.1.0
+- uses: Sofa-Loaf/actionscope/action@v0.1.3
 ```
 
 ## Maintainer clicks: publish the Action to Marketplace
@@ -65,7 +65,7 @@ GitHub does not list an Action from a tag or API release alone. An owner with 2F
 5. Check **Publish this Action to the GitHub Marketplace**.
 6. Use listing name **28to3-actionscope** (must stay unique vs other Marketplace actions, users, orgs, and reserved feature names). Product brand stays Actionscope.
 7. Pick a primary category such as **Continuous integration**. Optional second: **Reporting** or **Project management**.
-8. Point the release at tag **`v0.1.1`** (the unique listing name). Marketplace publish requires a tagged release and 2FA.
+8. Point the release at tag **`v0.1.3`** (finance-facing summary). Marketplace publish requires a tagged release and 2FA.
 9. Click **Publish release**.
 
 Do **not** mark the Action listing as paid. Leave billing and seats on the App/pilot track. Checkout stays on [28to3.me](https://28to3.me).
@@ -74,9 +74,9 @@ Do **not** mark the Action listing as paid. Leave billing and seats on the App/p
 
 - [x] Root `action.yml` with name, description, and branding (`activity` / `blue`)
 - [x] Nested `action/action.yml` still runnable
-- [x] README install path `uses: Sofa-Loaf/actionscope@v0.1.0`
+- [x] README install path `uses: Sofa-Loaf/actionscope@v0.1.3`
 - [ ] CI green on the ship PR; merge to `main`
-- [ ] GitHub Release **v0.1.1** on `main` (listing name `28to3-actionscope`)
+- [ ] GitHub Release **v0.1.3** on `main` (listing name `28to3-actionscope`)
 - [ ] Maintainer Marketplace publish clicks (above)
 - [x] Org pilot / learn more on [28to3.me](https://28to3.me) (site-only checkout)
 - [ ] GitHub App + $19/seat billing (later)

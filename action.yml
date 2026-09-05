@@ -2,8 +2,8 @@
 # Runtime is the shared implementation in action/ (same logic as uses: ./action).
 name: 28to3-actionscope
 description: >-
-  See where your GitHub Actions minutes go. Estimate billable minutes by job
-  and OS, then post a Job Summary for this run.
+  See where your GitHub Actions minutes go. Estimate wall time, rounded minutes,
+  runner SKU, list-price $, and included-minute burn, then post a Job Summary.
 author: Sofa-Loaf
 branding:
   icon: activity
@@ -14,10 +14,21 @@ inputs:
     description: Token used to read jobs for this workflow run. Defaults to the workflow GITHUB_TOKEN.
     required: false
     default: ${{ github.token }}
+  comment-on-pr:
+    description: >-
+      If true, also post (or update) a compact PR comment with the same numbers
+      as the Job Summary. Only runs on pull-request context. Requires
+      pull-requests: write. Default false.
+    required: false
+    default: 'false'
 
 outputs:
   estimated-minutes:
-    description: Estimated quota-equivalent billable minutes for jobs visible in this run
+    description: Estimated included-minute burn for jobs visible in this run
+  rounded-minutes:
+    description: Sum of GitHub-rounded minutes (each started job rounded up)
+  estimated-usd:
+    description: Estimated USD at documented GitHub list prices (4 decimal places)
   job-count:
     description: Number of jobs included in the estimate
   wall-seconds:
