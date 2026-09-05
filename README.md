@@ -67,7 +67,7 @@ The nested path still works if you already pinned it:
 - uses: ./action
 ```
 
-GitHub Marketplace can only list a repository that has `action.yml` at the **root**. That file runs the same `action/` implementation.
+GitHub Marketplace can only list a repository that has `action.yml` at the **root**. That file runs the same `action/` implementation. The Marketplace listing name is **28to3-actionscope**; the product brand remains Actionscope.
 
 The Action reads jobs for the current workflow run from the GitHub API, estimates **quota-equivalent minutes**, and writes a Job Summary.
 
@@ -102,4 +102,4 @@ This repo’s [demo workflow](.github/workflows/demo.yml) runs unit tests, two s
 
 ## Status
 
-Public v0.1.0: Marketplace-ready free Action. The **$49 Actionscope Org Pilot** Stripe link is live; App billing ($19/seat) comes next — see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
+Public v0.1.1: Marketplace-ready free Action listed as **28to3-actionscope**. The **$49 Actionscope Org Pilot** Stripe link is live; App billing ($19/seat) comes next — see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).

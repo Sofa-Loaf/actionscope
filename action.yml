@@ -1,6 +1,6 @@
 # Marketplace listing requires action.yml at the repository root.
 # Runtime is the shared implementation in action/ (same logic as uses: ./action).
-name: Actionscope
+name: 28to3-actionscope
 description: >-
   See where your GitHub Actions minutes go. Estimate billable minutes by job
   and OS, then post a Job Summary for this run.
