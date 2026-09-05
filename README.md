@@ -2,7 +2,9 @@
 
 See where your GitHub Actions minutes go.
 
-**Free Action** (this repo) estimates quota-equivalent minutes for the current workflow run and writes a [Job Summary](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary). **Paid org attribution** is a GitHub App later — not a paid Marketplace Action.
+**[Install the free Action](#how-to-use)** · **[Get an org pilot or learn more](https://28to3.me)**
+
+**Free Action** (this repo) estimates quota-equivalent minutes for the current workflow run and writes a [Job Summary](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary). Org-level attribution and the org pilot live on **[28to3.me](https://28to3.me)** — not a paid Marketplace Action.
 
 ```yaml
 - name: Actionscope
@@ -28,21 +30,21 @@ If you have one Linux lint job on a public repo, you don’t need this. If you h
 | What | A step you add to a workflow | Org-level product |
 | Output | Job Summary for **this run**: jobs, durations, rough minute attribution | History, trends, “this workflow costs X / month”, budget alerts |
 | Auth | None — uses the workflow `GITHUB_TOKEN` | GitHub App |
-| Billing | Free. Estimates only. Actions Marketplace listings cannot be paid. | **$49 / org pilot**, then **$19 / seat** |
+| Billing | Free. Estimates only. Actions Marketplace listings cannot be paid. | Org pilot, then seats — see [28to3.me](https://28to3.me) |
 
-v0.1 is the free Action. The App, invoices, and org dashboard are not in this repo. Go-to-market and checkout notes: [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
+v0.1 is the free Action. The App, invoices, and org dashboard are not in this repo. Positioning notes: [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
 
 ## Pricing
 
-The Action is free. Revenue is the App and pilots, not a paid Marketplace listing.
+The Action is free. Org pilots and seats are offered on the website, not as a paid Marketplace listing.
 
 | Plan | Price | Status |
 | --- | --- | --- |
 | Action | $0 | Available — pin `@v0.1.0` |
-| Org pilot | **$49 / org** | [$49 Actionscope Org Pilot (live Stripe)](https://buy.stripe.com/8x2dRa7woa65dOA6uz0co00) |
-| Seat | **$19 / seat** | Ships with the GitHub App |
+| Org pilot | $49 / org | [Get the org pilot](https://28to3.me) |
+| Seat | $19 / seat | Ships with the GitHub App |
 
-This is the live **$49 Actionscope Org Pilot** Stripe Payment Link. The $19/seat plan ships with the GitHub App.
+Checkout stays on **[28to3.me](https://28to3.me)**. This repository does not host payment links.
 
 ## How to use
 
@@ -102,4 +104,4 @@ This repo’s [demo workflow](.github/workflows/demo.yml) runs unit tests, two s
 
 ## Status
 
-Public v0.1.1: Marketplace-ready free Action listed as **28to3-actionscope**. The **$49 Actionscope Org Pilot** Stripe link is live; App billing ($19/seat) comes next — see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
+Public v0.1.1: Marketplace-ready free Action listed as **28to3-actionscope**. Org pilots are invited from [28to3.me](https://28to3.me); App billing ($19/seat) comes next — see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).

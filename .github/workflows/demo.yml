@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run estimate tests
-        run: node action/estimate.test.js
+        run: node action/estimate.test.js && node action/index.integration.test.js
       - name: Root action.yml is Marketplace-ready
         run: |
           test -f action.yml
@@ -26,6 +26,7 @@ jobs:
           grep -q 'color: blue' action.yml
           grep -q 'using: node24' action.yml
           grep -q 'main: action/index.js' action.yml
+          ! grep -n 'buy.stripe.com' README.md CONTRIBUTING.md docs/GO_TO_MARKET.md action.yml action/action.yml action/estimate.js action/index.js
 
   build:
     name: Fake build

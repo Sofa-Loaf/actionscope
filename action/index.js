@@ -3,20 +3,27 @@
 const fs = require('fs');
 const { estimateRun, renderSummary } = require('./estimate');
 
-function input(name, fallback = '') {
-  const key = `INPUT_${name.replace(/ /g, '_').toUpperCase()}`;
-  const value = process.env[key];
-  return value !== undefined && value !== '' ? value : fallback;
+function input(name, fallback = '', env = process.env) {
+  const upper = name.toUpperCase();
+  const keys = [
+    `INPUT_${upper.replace(/[-\s]/g, '_')}`,
+    `INPUT_${upper.replace(/ /g, '_')}`,
+  ];
+  for (const key of keys) {
+    const value = env[key];
+    if (value !== undefined && value !== '') return value;
+  }
+  return fallback;
 }
 
-function writeOutput(name, value) {
-  const dest = process.env.GITHUB_OUTPUT;
+function writeOutput(name, value, env = process.env) {
+  const dest = env.GITHUB_OUTPUT;
   if (!dest) return;
   fs.appendFileSync(dest, `${name}=${value}\n`);
 }
 
-function writeSummary(markdown) {
-  const dest = process.env.GITHUB_STEP_SUMMARY;
+function writeSummary(markdown, env = process.env) {
+  const dest = env.GITHUB_STEP_SUMMARY;
   if (dest) {
     fs.appendFileSync(dest, markdown);
   }
@@ -24,9 +31,9 @@ function writeSummary(markdown) {
   if (!markdown.endsWith('\n')) process.stdout.write('\n');
 }
 
-async function fetchJobs({ apiUrl, token, owner, repo, runId }) {
+async function fetchJobs({ apiUrl, token, owner, repo, runId, fetchImpl = globalThis.fetch }) {
   const url = `${apiUrl}/repos/${owner}/${repo}/actions/runs/${runId}/jobs?per_page=100`;
-  const res = await fetch(url, {
+  const res = await fetchImpl(url, {
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
@@ -36,8 +43,8 @@ async function fetchJobs({ apiUrl, token, owner, repo, runId }) {
   });
 
   if (!res.ok) {
-    const body = await res.text();
-    const err = new Error(`GitHub API ${res.status} ${res.statusText}: ${body.slice(0, 300)}`);
+    const body = typeof res.text === 'function' ? await res.text() : '';
+    const err = new Error(`GitHub API ${res.status} ${res.statusText}: ${String(body).slice(0, 300)}`);
     err.status = res.status;
     throw err;
   }
@@ -46,63 +53,73 @@ async function fetchJobs({ apiUrl, token, owner, repo, runId }) {
   return data.jobs || [];
 }
 
-function fallbackJob() {
+function fallbackJob(env = process.env) {
   return {
-    name: process.env.GITHUB_JOB || 'current job',
+    name: env.GITHUB_JOB || 'current job',
     status: 'in_progress',
     started_at: null,
     completed_at: null,
-    labels: [process.env.RUNNER_OS || 'Linux'],
-    runner_name: process.env.RUNNER_NAME || '',
+    labels: [env.RUNNER_OS || 'Linux'],
+    runner_name: env.RUNNER_NAME || '',
   };
 }
 
-async function main() {
-  const token = input('github-token', process.env.GITHUB_TOKEN || '');
-  const repository = process.env.GITHUB_REPOSITORY || '';
+async function main({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
+  const token = input('github-token', env.GITHUB_TOKEN || '', env);
+  const repository = env.GITHUB_REPOSITORY || '';
   const [owner, repo] = repository.split('/');
-  const runId = process.env.GITHUB_RUN_ID;
-  const apiUrl = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\/$/, '');
-  const serverUrl = (process.env.GITHUB_SERVER_URL || 'https://github.com').replace(/\/$/, '');
-  const fallbackOs = (process.env.RUNNER_OS || 'Linux').toLowerCase();
+  const runId = env.GITHUB_RUN_ID;
+  const apiUrl = (env.GITHUB_API_URL || 'https://api.github.com').replace(/\/$/, '');
+  const serverUrl = (env.GITHUB_SERVER_URL || 'https://github.com').replace(/\/$/, '');
+  const fallbackOs = (env.RUNNER_OS || 'Linux').toLowerCase();
 
   const meta = {
-    workflow: process.env.GITHUB_WORKFLOW || '',
+    workflow: env.GITHUB_WORKFLOW || '',
     runId,
-    runNumber: process.env.GITHUB_RUN_NUMBER,
+    runNumber: env.GITHUB_RUN_NUMBER,
     runUrl: owner && repo && runId ? `${serverUrl}/${owner}/${repo}/actions/runs/${runId}` : '',
   };
 
   let jobs = [];
   if (!token) {
     meta.apiWarning = 'No token available; falling back to the current job only (duration unknown).';
-    jobs = [fallbackJob()];
+    jobs = [fallbackJob(env)];
   } else if (!owner || !repo || !runId) {
     meta.apiWarning = 'Missing GITHUB_REPOSITORY or GITHUB_RUN_ID; falling back to the current job only.';
-    jobs = [fallbackJob()];
+    jobs = [fallbackJob(env)];
   } else {
     try {
-      jobs = await fetchJobs({ apiUrl, token, owner, repo, runId });
+      jobs = await fetchJobs({ apiUrl, token, owner, repo, runId, fetchImpl });
       if (jobs.length === 0) {
         meta.apiWarning = 'The Jobs API returned no jobs yet; falling back to the current job only.';
-        jobs = [fallbackJob()];
+        jobs = [fallbackJob(env)];
       }
     } catch (err) {
       meta.apiWarning = `Could not read jobs from the API (${err.message}). Falling back to the current job only.`;
-      jobs = [fallbackJob()];
+      jobs = [fallbackJob(env)];
     }
   }
 
   const estimate = estimateRun({ jobs, fallbackOs });
   const markdown = renderSummary({ estimate, meta });
 
-  writeSummary(markdown);
-  writeOutput('estimated-minutes', String(estimate.estimatedMinutes));
-  writeOutput('job-count', String(estimate.jobCount));
-  writeOutput('wall-seconds', String(estimate.wallSeconds));
+  writeSummary(markdown, env);
+  writeOutput('estimated-minutes', String(estimate.estimatedMinutes), env);
+  writeOutput('job-count', String(estimate.jobCount), env);
+  writeOutput('wall-seconds', String(estimate.wallSeconds), env);
+
+  return { estimate, markdown, meta, jobs };
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  main,
+  fetchJobs,
+  fallbackJob,
+};

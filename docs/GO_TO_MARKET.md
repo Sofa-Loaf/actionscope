@@ -2,7 +2,7 @@
 
 Actionscope is a **free GitHub Action** (this repo) plus a **paid GitHub App** (later) for org-level cost attribution.
 
-The Actions Marketplace listing is **free-only**. Do not attach paid SKUs, license keys, or Stripe checkout to the Action. Paid revenue is the App and a separate checkout for pilots.
+The Actions Marketplace listing is **free-only**. Do not attach paid SKUs, license keys, or payment checkout to the Action. Paid revenue is the App and a separate checkout on the website.
 
 ## Offer
 
@@ -12,11 +12,11 @@ The Actions Marketplace listing is **free-only**. Do not attach paid SKUs, licen
 | **Org pilot** | One engineering/FinOps buyer | Hands-on org attribution before the App is generally available | **$49 / org** (pilot) |
 | **Seat** | Same buyer, after pilot | Org dashboard access for people who need history, trends, and alerts | **$19 / seat** |
 
-Checkout for the $49 org pilot is the live Stripe Payment Link:
+Checkout for the org pilot is on the product site only:
 
-**[Pay $49 Actionscope Org Pilot](https://buy.stripe.com/8x2dRa7woa65dOA6uz0co00)**
+**[Get an org pilot or learn more](https://28to3.me)**
 
-This is the live **$49 Actionscope Org Pilot** Stripe Payment Link. The $19/seat plan is not sold through the Action; it ships with the GitHub App.
+The $19/seat plan is not sold through the Action; it ships with the GitHub App. Do not put payment URLs in this repository.
 
 ## Positioning
 
@@ -24,7 +24,7 @@ This is the live **$49 Actionscope Org Pilot** Stripe Payment Link. The $19/seat
 
 **Problem:** The invoice (or monthly quota) is a lump sum. A 12-second job still burns a full minute. macOS can consume **10×** Linux. Teams find out after finance asks.
 
-**Free Action:** Attribute **this run** before anyone leaves the workflow.
+**Free Action:** Attribute **this run** before anyone leaves the workflow. The Job Summary footer points at [28to3.me](https://28to3.me).
 
 **Paid App (later):** History, “this workflow costs X / month”, budgets, and org roll-up. That is the profit motion — not a paid Marketplace Action.
 
@@ -37,8 +37,8 @@ Skip public-repo hobby lint jobs. Those are usually not billed the same way.
 ## Channels
 
 1. **GitHub Marketplace (Action)** — discovery for the free step. Listing must use the **root** `action.yml`.
-2. **README + Job Summary** — every run is a demo; the summary points at the App/pilot when those exist.
-3. **Direct / Stripe** — $49 Actionscope Org Pilot via the live Payment Link above.
+2. **README + Job Summary** — every run is a demo; the summary invites an org pilot via [28to3.me](https://28to3.me).
+3. **Website** — org pilot and learn-more live on [28to3.me](https://28to3.me). Checkout stays on the site, not in this repo.
 4. **GitHub App Marketplace (later)** — paid listing when the App exists. Separate from the Action listing.
 
 ## Install (what we publish)
@@ -68,7 +68,7 @@ GitHub does not list an Action from a tag or API release alone. An owner with 2F
 8. Point the release at tag **`v0.1.1`** (the unique listing name). Marketplace publish requires a tagged release and 2FA.
 9. Click **Publish release**.
 
-Do **not** mark the Action listing as paid. Leave billing, seats, and Stripe on the App/pilot track.
+Do **not** mark the Action listing as paid. Leave billing and seats on the App/pilot track. Checkout stays on [28to3.me](https://28to3.me).
 
 ## Launch checklist
 
@@ -78,5 +78,5 @@ Do **not** mark the Action listing as paid. Leave billing, seats, and Stripe on 
 - [ ] CI green on the ship PR; merge to `main`
 - [ ] GitHub Release **v0.1.1** on `main` (listing name `28to3-actionscope`)
 - [ ] Maintainer Marketplace publish clicks (above)
-- [x] Live $49 Actionscope Org Pilot Stripe Payment Link
+- [x] Org pilot / learn more on [28to3.me](https://28to3.me) (site-only checkout)
 - [ ] GitHub App + $19/seat billing (later)
