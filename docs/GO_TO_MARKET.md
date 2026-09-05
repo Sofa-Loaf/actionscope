@@ -41,6 +41,8 @@ Skip public-repo hobby lint jobs. Those are usually not billed the same way.
 3. **Website** — org-level product and checkout live on [28to3.me](https://28to3.me). Checkout stays on the site, not in this repo.
 4. **GitHub App Marketplace (later)** — paid listing when the App exists. Separate from the Action listing.
 
+Overnight we watch **three numbers only** (pins of `@v0.1.3`, orgs with a 7-day run streak, $49 checkouts): [FUNNEL.md](FUNNEL.md).
+
 ## Install (what we publish)
 
 ```yaml

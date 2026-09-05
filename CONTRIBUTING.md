@@ -16,6 +16,8 @@ action/                 # shared runtime (also uses: .../action@vX)
   index.integration.test.js
 CHANGELOG.md
 docs/GO_TO_MARKET.md
+docs/FUNNEL.md          # three overnight metrics (not a dashboard)
+docs/funnel-metrics.js  # optional GitHub/Stripe pull
 .github/workflows/demo.yml
 ```
 
