@@ -1,8 +1,8 @@
 {
   "name": "actionscope-action",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "private": true,
-  "description": "See where your GitHub Actions minutes go. Estimate billable minutes by job and OS.",
+  "description": "See where your GitHub Actions minutes go. Estimate wall time, SKU, list-price $, and included-minute burn.",
   "main": "index.js",
   "engines": {
     "node": ">=20"

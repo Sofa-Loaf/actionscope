@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const { estimateRun, renderSummary } = require('./estimate');
+const { estimateRun, renderSummary, renderComment, parseBool, COMMENT_MARKER } = require('./estimate');
 
 function input(name, fallback = '', env = process.env) {
   const upper = name.toUpperCase();
@@ -53,6 +53,91 @@ async function fetchJobs({ apiUrl, token, owner, repo, runId, fetchImpl = global
   return data.jobs || [];
 }
 
+function githubHeaders(token) {
+  return {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${token}`,
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'actionscope',
+  };
+}
+
+function readEventPayload(env = process.env) {
+  const eventPath = env.GITHUB_EVENT_PATH;
+  if (!eventPath) return null;
+  try {
+    return JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function getPullRequestNumber(env = process.env) {
+  const event = readEventPayload(env);
+  if (event?.pull_request?.number) return Number(event.pull_request.number);
+  if (event?.issue?.pull_request && event.issue.number) return Number(event.issue.number);
+  const ref = env.GITHUB_REF || '';
+  const fromRef = ref.match(/^refs\/pull\/(\d+)\//);
+  if (fromRef) return Number(fromRef[1]);
+  return null;
+}
+
+async function findExistingComment({ apiUrl, token, owner, repo, issueNumber, fetchImpl }) {
+  const url = `${apiUrl}/repos/${owner}/${repo}/issues/${issueNumber}/comments?per_page=100`;
+  const res = await fetchImpl(url, { headers: githubHeaders(token) });
+  if (!res.ok) {
+    const body = typeof res.text === 'function' ? await res.text() : '';
+    const err = new Error(`GitHub API ${res.status} ${res.statusText}: ${String(body).slice(0, 300)}`);
+    err.status = res.status;
+    throw err;
+  }
+  const comments = await res.json();
+  if (!Array.isArray(comments)) return null;
+  return comments.find((comment) => typeof comment.body === 'string' && comment.body.includes(COMMENT_MARKER)) || null;
+}
+
+async function upsertPullRequestComment({
+  apiUrl,
+  token,
+  owner,
+  repo,
+  issueNumber,
+  body,
+  fetchImpl = globalThis.fetch,
+}) {
+  const existing = await findExistingComment({ apiUrl, token, owner, repo, issueNumber, fetchImpl });
+  if (existing?.id) {
+    const url = `${apiUrl}/repos/${owner}/${repo}/issues/comments/${existing.id}`;
+    const res = await fetchImpl(url, {
+      method: 'PATCH',
+      headers: { ...githubHeaders(token), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body }),
+    });
+    if (!res.ok) {
+      const text = typeof res.text === 'function' ? await res.text() : '';
+      const err = new Error(`GitHub API ${res.status} ${res.statusText}: ${String(text).slice(0, 300)}`);
+      err.status = res.status;
+      throw err;
+    }
+    return { action: 'updated', id: existing.id };
+  }
+
+  const url = `${apiUrl}/repos/${owner}/${repo}/issues/${issueNumber}/comments`;
+  const res = await fetchImpl(url, {
+    method: 'POST',
+    headers: { ...githubHeaders(token), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ body }),
+  });
+  if (!res.ok) {
+    const text = typeof res.text === 'function' ? await res.text() : '';
+    const err = new Error(`GitHub API ${res.status} ${res.statusText}: ${String(text).slice(0, 300)}`);
+    err.status = res.status;
+    throw err;
+  }
+  const created = await res.json();
+  return { action: 'created', id: created.id };
+}
+
 function fallbackJob(env = process.env) {
   return {
     name: env.GITHUB_JOB || 'current job',
@@ -62,6 +147,44 @@ function fallbackJob(env = process.env) {
     labels: [env.RUNNER_OS || 'Linux'],
     runner_name: env.RUNNER_NAME || '',
   };
+}
+
+async function maybeCommentOnPullRequest({
+  env,
+  token,
+  owner,
+  repo,
+  apiUrl,
+  markdown,
+  fetchImpl,
+  meta,
+}) {
+  if (!parseBool(input('comment-on-pr', 'false', env))) {
+    return { skipped: true, reason: 'disabled' };
+  }
+  const issueNumber = getPullRequestNumber(env);
+  if (!issueNumber) {
+    return { skipped: true, reason: 'not-a-pull-request' };
+  }
+  if (!token || !owner || !repo) {
+    meta.commentWarning = 'comment-on-pr is enabled but token or repository context is missing; skipped the PR comment.';
+    return { skipped: true, reason: 'missing-context' };
+  }
+  try {
+    const result = await upsertPullRequestComment({
+      apiUrl,
+      token,
+      owner,
+      repo,
+      issueNumber,
+      body: markdown,
+      fetchImpl,
+    });
+    return { skipped: false, issueNumber, ...result };
+  } catch (err) {
+    meta.commentWarning = `Could not comment on PR #${issueNumber} (${err.message}).`;
+    return { skipped: true, reason: 'api-error', error: err };
+  }
 }
 
 async function main({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
@@ -102,13 +225,30 @@ async function main({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
 
   const estimate = estimateRun({ jobs, fallbackOs });
   const markdown = renderSummary({ estimate, meta });
+  const commentMarkdown = renderComment({ estimate, meta });
 
   writeSummary(markdown, env);
   writeOutput('estimated-minutes', String(estimate.estimatedMinutes), env);
+  writeOutput('rounded-minutes', String(estimate.roundedMinutes), env);
+  writeOutput('estimated-usd', estimate.estimatedUsd.toFixed(4), env);
   writeOutput('job-count', String(estimate.jobCount), env);
   writeOutput('wall-seconds', String(estimate.wallSeconds), env);
 
-  return { estimate, markdown, meta, jobs };
+  const comment = await maybeCommentOnPullRequest({
+    env,
+    token,
+    owner,
+    repo,
+    apiUrl,
+    markdown: commentMarkdown,
+    fetchImpl,
+    meta,
+  });
+  if (meta.commentWarning) {
+    process.stdout.write(`Note: ${meta.commentWarning}\n`);
+  }
+
+  return { estimate, markdown, commentMarkdown, meta, jobs, comment };
 }
 
 if (require.main === module) {
@@ -122,4 +262,6 @@ module.exports = {
   main,
   fetchJobs,
   fallbackJob,
+  getPullRequestNumber,
+  upsertPullRequestComment,
 };

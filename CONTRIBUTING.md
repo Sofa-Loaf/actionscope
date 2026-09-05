@@ -1,8 +1,8 @@
 # Contributing
 
-Actionscope v0.1 is a small GitHub Action that posts a Job Summary. Keep changes lean. No GitHub App, payment checkout, or org dashboard in this repo.
+Actionscope v0.1.3 is a small GitHub Action that posts a finance-facing Job Summary. Keep changes lean. No GitHub App, payment checkout, or org dashboard in this repo.
 
-The Actions Marketplace listing is **free-only**. Org pilots and seats belong on [28to3.me](https://28to3.me) and the App track — see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md). Do not add payment URLs here.
+The Actions Marketplace listing is **free-only**. Org-level product belongs on [28to3.me](https://28to3.me) and the App track — see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md). Do not add payment URLs here. Do not sell vague pilots in Action copy (Job Summary, PR comment, `action.yml` description).
 
 ## Layout
 
@@ -10,10 +10,11 @@ The Actions Marketplace listing is **free-only**. Org pilots and seats belong on
 action.yml              # Marketplace + uses: Sofa-Loaf/actionscope@vX
 action/                 # shared runtime (also uses: .../action@vX)
   action.yml
-  index.js              # GitHub runtime: API + summary
+  index.js              # GitHub runtime: API + summary + optional PR comment
   estimate.js           # pure estimate + markdown
   estimate.test.js
   index.integration.test.js
+CHANGELOG.md
 docs/GO_TO_MARKET.md
 .github/workflows/demo.yml
 ```
@@ -35,7 +36,7 @@ node action/index.integration.test.js
 
 1. Push a branch (or open a PR). The demo workflow runs automatically.
 2. Open the workflow run → **Actionscope estimate** job → **Summary**.
-3. Confirm jobs, partial duration on the estimate job itself, and a non-zero minute estimate.
+3. Confirm wall time, rounded minutes, runner SKU, list-price $, and included-minute burn. On a PR with `comment-on-pr: true`, confirm the comment matches the summary.
 
 You can also dispatch **Actionscope demo** from the Actions tab.
 
@@ -49,4 +50,4 @@ GITHUB_WORKFLOW=local GITHUB_JOB=dev node action/index.js
 
 ## What not to add yet
 
-OAuth, a GitHub App, payment checkout URLs, dollar invoices, or org dashboards. Those are the paid App track. Do not put paid Marketplace metadata or payment links on the Action listing. Point org-pilot interest at [28to3.me](https://28to3.me) only.
+OAuth, a GitHub App, payment checkout URLs, or org dashboards. Those are the paid App track. List-price **estimates** in the Job Summary are in scope; do not present them as invoices. Do not put paid Marketplace metadata or payment links on the Action listing. Point org-level interest at [28to3.me](https://28to3.me) only.
