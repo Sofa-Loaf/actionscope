@@ -12,11 +12,11 @@ The Actions Marketplace listing is **free-only**. Do not attach paid SKUs, licen
 | **Org pilot** | One engineering/FinOps buyer | Hands-on org attribution before the App is generally available | **$49 / org** (pilot) |
 | **Seat** | Same buyer, after pilot | Org dashboard access for people who need history, trends, and alerts | **$19 / seat** |
 
-Checkout for the $49 org pilot is a **placeholder** until Stripe is connected:
+Checkout for the $49 org pilot is the live Stripe Payment Link:
 
-**[Pay $49 org pilot (Stripe placeholder)](https://buy.stripe.com/test_placeholder_actionscope_org_pilot)**
+**[Pay $49 Actionscope Org Pilot](https://buy.stripe.com/8x2dRa7woa65dOA6uz0co00)**
 
-Replace that URL with a real Stripe Payment Link before taking money. The $19/seat plan is not sold through the Action; it ships with the GitHub App.
+This is the live **$49 Actionscope Org Pilot** Stripe Payment Link. The $19/seat plan is not sold through the Action; it ships with the GitHub App.
 
 ## Positioning
 
@@ -38,7 +38,7 @@ Skip public-repo hobby lint jobs. Those are usually not billed the same way.
 
 1. **GitHub Marketplace (Action)** — discovery for the free step. Listing must use the **root** `action.yml`.
 2. **README + Job Summary** — every run is a demo; the summary points at the App/pilot when those exist.
-3. **Direct / Stripe** — $49 org pilots via the Payment Link above (placeholder today).
+3. **Direct / Stripe** — $49 Actionscope Org Pilot via the live Payment Link above.
 4. **GitHub App Marketplace (later)** — paid listing when the App exists. Separate from the Action listing.
 
 ## Install (what we publish)
@@ -78,5 +78,5 @@ Do **not** mark the Action listing as paid. Leave billing, seats, and Stripe on 
 - [ ] CI green on the ship PR; merge to `main`
 - [ ] GitHub Release **v0.1.0** on `main`
 - [ ] Maintainer Marketplace publish clicks (above)
-- [ ] Replace the Stripe placeholder with a live $49 Payment Link
+- [x] Live $49 Actionscope Org Pilot Stripe Payment Link
 - [ ] GitHub App + $19/seat billing (later)

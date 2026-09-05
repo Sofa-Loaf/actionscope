@@ -39,10 +39,10 @@ The Action is free. Revenue is the App and pilots, not a paid Marketplace listin
 | Plan | Price | Status |
 | --- | --- | --- |
 | Action | $0 | Available — pin `@v0.1.0` |
-| Org pilot | **$49 / org** | [Stripe checkout (placeholder)](https://buy.stripe.com/test_placeholder_actionscope_org_pilot) |
+| Org pilot | **$49 / org** | [$49 Actionscope Org Pilot (live Stripe)](https://buy.stripe.com/8x2dRa7woa65dOA6uz0co00) |
 | Seat | **$19 / seat** | Ships with the GitHub App |
 
-The Stripe URL is a placeholder until a live Payment Link is created. Do not treat it as a working charge.
+This is the live **$49 Actionscope Org Pilot** Stripe Payment Link. The $19/seat plan ships with the GitHub App.
 
 ## How to use
 
@@ -102,4 +102,4 @@ This repo’s [demo workflow](.github/workflows/demo.yml) runs unit tests, two s
 
 ## Status
 
-Public v0.1.0: Marketplace-ready free Action. App billing and a live Stripe link come next — see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
+Public v0.1.0: Marketplace-ready free Action. The **$49 Actionscope Org Pilot** Stripe link is live; App billing ($19/seat) comes next — see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
