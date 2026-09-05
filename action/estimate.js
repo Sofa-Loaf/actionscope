@@ -7,6 +7,9 @@ const OS_MULTIPLIERS = {
   macos: 10,
 };
 
+/** Public product site. Checkout lives here — never Stripe URLs in this repo. */
+const PRODUCT_SITE = 'https://28to3.me';
+
 /**
  * Infer a billing OS from job labels, runner name, or a fallback like RUNNER_OS.
  * @param {{ labels?: string[], runner_name?: string }} job
@@ -128,7 +131,7 @@ function attributionHint(rows) {
   }
   const parts = Object.entries(byOs)
     .sort((a, b) => b[1] - a[1])
-    .map(([os, minutes]) => `${minutes} on ${os}`);
+    .map(([os, minutes]) => `${minutes} min on ${os}`);
   return parts.join(', ');
 }
 
@@ -141,23 +144,34 @@ function renderSummary({ estimate, meta }) {
   const { rows, estimatedMinutes, wallSeconds, inProgressCount } = estimate;
   const runLink = meta.runUrl ? `[#${meta.runNumber || meta.runId}](${meta.runUrl})` : `#${meta.runNumber || meta.runId || '?'}`;
   const lines = [
-    '## Actionscope — minute estimate',
+    '## Actionscope',
+    '',
+    'Estimated **quota-equivalent minutes** for this workflow run. This is a lens on where included minutes go — **not an invoice**.',
+    '',
+    '### This run',
     '',
     `| | |`,
     `| --- | --- |`,
     `| Workflow | ${meta.workflow || 'unknown'} |`,
     `| Run | ${runLink} |`,
-    `| Jobs visible | ${estimate.jobCount} |`,
-    `| Wall-clock (sum) | ${formatDuration(wallSeconds * 1000)} |`,
-    `| **Estimated billable minutes** | **~${estimatedMinutes}** |`,
+    `| Jobs included | ${estimate.jobCount} |`,
+    `| Combined wall-clock | ${formatDuration(wallSeconds * 1000)} |`,
+    `| **Estimated minutes** | **~${estimatedMinutes}** |`,
     '',
   ];
 
   if (rows.length === 0) {
-    lines.push('_No jobs were returned for this run. The estimate could not be computed._', '');
+    lines.push(
+      '### Jobs',
+      '',
+      '_No jobs were returned for this run, so there is nothing to attribute yet._',
+      '',
+    );
   } else {
     lines.push(
-      '| Job | Status | Duration | Runner | Multiplier | Billable min (est.) |',
+      '### Jobs',
+      '',
+      '| Job | Status | Duration | Runner | Multiplier | Est. minutes |',
       '| --- | --- | --- | --- | --- | ---: |',
     );
     for (const row of rows) {
@@ -170,31 +184,44 @@ function renderSummary({ estimate, meta }) {
     lines.push('');
     const hint = attributionHint(rows);
     if (hint) {
-      lines.push(`Rough attribution: ${hint}.`, '');
+      lines.push(`Minutes by runner: ${hint}.`, '');
     }
   }
 
   lines.push(
-    '### How this is calculated',
+    '### How this estimate is calculated',
     '',
-    '- Each job is rounded **up to the next whole minute**, then multiplied by OS: Linux **1×**, Windows **2×**, macOS **10×**.',
-    '- That matches how included-minute quota is typically consumed on private repos. Public repos and most self-hosted runners are not billed the same way.',
-    '- This is **not an invoice**. Larger runners, custom SKUs, storage, and GitHub’s current per-minute price table are out of scope for v0.',
+    '1. Each job’s wall-clock time is rounded **up to the next whole minute** (a 12-second job counts as 1).',
+    '2. That minute count is multiplied by the runner OS used for included-minute quota: Linux **1×**, Windows **2×**, macOS **10×**.',
+    '3. Jobs that never started contribute **0**. Jobs still running use a **partial** duration through now.',
+    '',
+    'Public repositories and typical self-hosted runners are often not billed the same way. Larger runners, custom SKUs, and storage are out of scope.',
+    '',
   );
 
   if (inProgressCount > 0) {
-    lines.push(`- ${inProgressCount} job${inProgressCount === 1 ? ' is' : 's are'} still running; those durations are partial.`);
+    const verb = inProgressCount === 1 ? 'is' : 'are';
+    lines.push(
+      `**Note:** ${inProgressCount} job${inProgressCount === 1 ? '' : 's'} ${verb} still running; those rows show a partial duration.`,
+      '',
+    );
   }
   if (meta.apiWarning) {
-    lines.push(`- ${meta.apiWarning}`);
+    lines.push(`**Note:** ${meta.apiWarning}`, '');
   }
 
-  lines.push('');
+  lines.push(
+    '---',
+    '',
+    `Invite an org pilot or learn more at **[${PRODUCT_SITE.replace(/^https:\/\//, '')}](${PRODUCT_SITE})**.`,
+    '',
+  );
   return lines.join('\n');
 }
 
 module.exports = {
   OS_MULTIPLIERS,
+  PRODUCT_SITE,
   inferOs,
   multiplierForOs,
   jobDurationMs,

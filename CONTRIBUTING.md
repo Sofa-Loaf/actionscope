@@ -1,8 +1,8 @@
 # Contributing
 
-Actionscope v0.1 is a small GitHub Action that posts a Job Summary. Keep changes lean. No GitHub App, Stripe charges, or org dashboard in this repo.
+Actionscope v0.1 is a small GitHub Action that posts a Job Summary. Keep changes lean. No GitHub App, payment checkout, or org dashboard in this repo.
 
-The Actions Marketplace listing is **free-only**. Paid pilots ($49 / org) and seats ($19) belong to the App track — see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md).
+The Actions Marketplace listing is **free-only**. Org pilots and seats belong on [28to3.me](https://28to3.me) and the App track — see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md). Do not add payment URLs here.
 
 ## Layout
 
@@ -13,6 +13,7 @@ action/                 # shared runtime (also uses: .../action@vX)
   index.js              # GitHub runtime: API + summary
   estimate.js           # pure estimate + markdown
   estimate.test.js
+  index.integration.test.js
 docs/GO_TO_MARKET.md
 .github/workflows/demo.yml
 ```
@@ -25,9 +26,10 @@ Requires Node 20+ locally. The GitHub-hosted runtime is **Node 24** (`runs.using
 
 ```bash
 node action/estimate.test.js
+node action/index.integration.test.js
 ```
 
-`package.json` in `action/` exposes the same check as `npm test` if you `cd action`.
+`package.json` in `action/` exposes both as `npm test` if you `cd action`.
 
 ## Manual check on GitHub
 
@@ -47,4 +49,4 @@ GITHUB_WORKFLOW=local GITHUB_JOB=dev node action/index.js
 
 ## What not to add yet
 
-OAuth, a GitHub App, live Stripe webhooks, dollar invoices, or org dashboards. Those are the paid App track. Do not put paid Marketplace metadata on the Action listing.
+OAuth, a GitHub App, payment checkout URLs, dollar invoices, or org dashboards. Those are the paid App track. Do not put paid Marketplace metadata or payment links on the Action listing. Point org-pilot interest at [28to3.me](https://28to3.me) only.

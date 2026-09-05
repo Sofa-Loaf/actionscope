@@ -8,6 +8,6 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node estimate.test.js"
+    "test": "node estimate.test.js && node index.integration.test.js"
   }
 }
