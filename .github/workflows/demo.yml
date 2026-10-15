@@ -29,8 +29,12 @@ jobs:
           grep -q 'main: action/index.js' action.yml
           grep -q 'comment-on-pr' action.yml action/action.yml
           grep -q 'estimated-usd' action.yml action/action.yml
-          ! grep -n 'buy.stripe.com' README.md CONTRIBUTING.md CHANGELOG.md docs/GO_TO_MARKET.md action.yml action/action.yml action/estimate.js action/index.js
-          ! grep -n 'org pilot' action.yml action/action.yml action/estimate.js action/index.js
+          if grep -n 'buy.stripe.com' README.md CONTRIBUTING.md CHANGELOG.md docs/GO_TO_MARKET.md action.yml action/action.yml action/estimate.js action/index.js; then
+            exit 1
+          fi
+          if grep -n 'org pilot' action.yml action/action.yml action/estimate.js action/index.js; then
+            exit 1
+          fi
 
   build:
     name: Fake build

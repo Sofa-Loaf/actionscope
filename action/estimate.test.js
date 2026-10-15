@@ -19,6 +19,7 @@ const {
   formatDuration,
   formatUsd,
   estimateRun,
+  mdEscape,
   renderSummary,
   renderComment,
   parseBool,
@@ -39,6 +40,28 @@ function linuxJob(overrides = {}) {
     labels: ['ubuntu-latest'],
     ...overrides,
   };
+}
+
+function unescapedCells(line) {
+  const cells = [];
+  let current = '';
+  for (let i = 0; i < line.length; i += 1) {
+    if (line[i] === '\\' && i + 1 < line.length) {
+      current += line[i] + line[i + 1];
+      i += 1;
+      continue;
+    }
+    if (line[i] === '|') {
+      cells.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += line[i];
+  }
+  cells.push(current.trim());
+  if (cells[0] === '') cells.shift();
+  if (cells[cells.length - 1] === '') cells.pop();
+  return cells;
 }
 
 function assertNoQuotaHeadline(md) {
@@ -432,6 +455,85 @@ test('marks in-progress rows and pluralizes the partial-duration note', () => {
   assert.match(md, /\$0\.0160/);
   assert.match(md, /Included-minute burn \| 3/);
   assertNoQuotaHeadline(md);
+});
+
+test('escapes hostile job names so the summary and PR comment stay inert', () => {
+  const hostile = 'build | @someuser [login](https://evil.example) ![x](https://evil.example/p.png)';
+  const estimate = estimateRun({
+    jobs: [
+      linuxJob({
+        name: 'Build (linux)',
+        conclusion: 'success',
+        html_url: 'https://github.com/acme/app/actions/runs/1/job/2',
+      }),
+      linuxJob({
+        name: hostile,
+        conclusion: 'failed | @reviewer',
+        html_url: 'https://github.com/acme/app/actions/runs/1/job/9',
+      }),
+    ],
+  });
+  assert.strictEqual(estimate.rows[1].name, hostile);
+  assert.strictEqual(estimate.rows[1].status, 'failed | @reviewer');
+
+  const meta = {
+    workflow: 'Nightly\n| injected | @someuser [login](https://evil.example) ![x](https://evil.example/p.png)',
+    runId: '99',
+    runNumber: '7',
+    runUrl: 'https://github.com/acme/app/actions/runs/99',
+  };
+  const summary = renderSummary({ estimate, meta });
+  const comment = renderComment({ estimate, meta });
+
+  for (const md of [summary, comment]) {
+    assert.ok(!md.includes('@someuser'), 'mention must not survive');
+    assert.ok(!md.includes('@reviewer'), 'mention must not survive');
+    assert.ok(!md.includes('[login]'), 'link label must not survive');
+    assert.ok(!md.includes('![x]'), 'image must not survive');
+    assert.ok(!md.includes('https://evil.example'), 'autolink must not survive');
+    assert.ok(md.includes('someuser'));
+    assert.ok(md.includes('login'));
+    assert.ok(!md.split('\n').some((line) => line.startsWith('| injected')));
+  }
+
+  assert.ok(
+    summary.includes('[Build \\(linux\\)](https://github.com/acme/app/actions/runs/1/job/2)'),
+  );
+  assert.match(summary, /\| success \|/);
+
+  const summaryJob = summary.split('\n').find((line) => line.includes('/job/9'));
+  assert.ok(summaryJob);
+  const summaryCells = unescapedCells(summaryJob);
+  assert.strictEqual(summaryCells.length, 7, summaryCells.join(' || '));
+  assert.match(summaryCells[0], /^\[build/);
+  assert.match(summaryCells[0], /\]\(https:\/\/github.com\/acme\/app\/actions\/runs\/1\/job\/9\)$/);
+  assert.ok(summaryCells[1].includes('failed'));
+  assert.ok(summaryCells[1].includes('reviewer'));
+
+  const commentJob = comment.split('\n').find((line) => line.includes('/job/9'));
+  assert.ok(commentJob);
+  const commentCells = unescapedCells(commentJob);
+  assert.strictEqual(commentCells.length, 6, commentCells.join(' || '));
+  assert.match(commentCells[0], /\]\(https:\/\/github.com\/acme\/app\/actions\/runs\/1\/job\/9\)$/);
+
+  const workflowRow = summary.split('\n').find((line) => line.startsWith('| Workflow |'));
+  assert.ok(workflowRow);
+  assert.strictEqual(unescapedCells(workflowRow).length, 2);
+  assert.ok(workflowRow.includes('Nightly'));
+  assert.ok(workflowRow.includes('injected'));
+
+  const plain = renderSummary({
+    estimate: estimateRun({ jobs: [linuxJob({ name: 'lint', conclusion: 'success' })] }),
+    meta: { workflow: 'CI', runId: '1' },
+  });
+  assert.match(plain, /\| Workflow \| CI \|/);
+  assert.match(plain, /\| lint \| success \|/);
+
+  const chopped = mdEscape(`a${']'.repeat(80)}`);
+  assert.ok(chopped.length <= 120);
+  assert.ok(!chopped.endsWith('\\'));
+  assert.strictEqual(mdEscape('Build (linux)'), 'Build \\(linux\\)');
+  assert.strictEqual(mdEscape('lint'), 'lint');
 });
 
 test('parseBool accepts GitHub Action truthy strings only', () => {
