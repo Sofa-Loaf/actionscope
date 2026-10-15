@@ -341,8 +341,28 @@ function skuRatesUsed(rows) {
   return [...seen.entries()].map(([sku, rateUsd]) => ({ sku, rateUsd }));
 }
 
+/**
+ * Embed untrusted text in GitHub Markdown (Job Summary or a PR comment).
+ * Punctuation is backslash-escaped, newlines become spaces, and length is capped.
+ * A zero-width space after @ stops mention notifications, and one inside ://
+ * stops GitHub from autolinking a URL hidden in a name.
+ */
+function mdEscape(value) {
+  let text = String(value ?? '')
+    .replace(/@/g, '@\u200b')
+    .replace(/[\\`*_{}\[\]<>()#+!|~@]/g, '\\$&')
+    .replace(/:\/\//g, ':\u200b//')
+    .replace(/\r?\n/g, ' ')
+    .slice(0, 120);
+  let trailingBackslashes = 0;
+  for (let i = text.length - 1; i >= 0 && text[i] === '\\'; i -= 1) trailingBackslashes += 1;
+  if (trailingBackslashes % 2 === 1) text = text.slice(0, -1);
+  return text;
+}
+
 function jobDisplayName(row) {
-  return row.htmlUrl ? `[${row.name}](${row.htmlUrl})` : row.name;
+  const name = mdEscape(row.name);
+  return row.htmlUrl ? `[${name}](${row.htmlUrl})` : name;
 }
 
 function jobWallLabel(row) {
@@ -360,6 +380,7 @@ function renderJobTable(rows, { compact = false } = {}) {
 
   for (const row of rows) {
     const name = jobDisplayName(row);
+    const status = mdEscape(row.status);
     const wall = jobWallLabel(row);
     const sku = `\`${row.sku}\``;
     const usd = formatUsd(row.listPriceUsd);
@@ -369,7 +390,7 @@ function renderJobTable(rows, { compact = false } = {}) {
       );
     } else {
       lines.push(
-        `| ${name} | ${row.status} | ${wall} | ${row.roundedMinutes} | ${sku} | ${usd} | ${row.includedMinutes} |`,
+        `| ${name} | ${status} | ${wall} | ${row.roundedMinutes} | ${sku} | ${usd} | ${row.includedMinutes} |`,
       );
     }
   }
@@ -405,6 +426,7 @@ function renderRatesFootnote(rows) {
  */
 function renderSummary({ estimate, meta }) {
   const { rows, estimatedMinutes, roundedMinutes: rounded, estimatedUsd, wallSeconds, inProgressCount } = estimate;
+  const workflow = mdEscape(meta.workflow || 'unknown');
   const runLink = meta.runUrl
     ? `[#${meta.runNumber || meta.runId}](${meta.runUrl})`
     : `#${meta.runNumber || meta.runId || '?'}`;
@@ -417,7 +439,7 @@ function renderSummary({ estimate, meta }) {
     '',
     `| | |`,
     `| --- | --- |`,
-    `| Workflow | ${meta.workflow || 'unknown'} |`,
+    `| Workflow | ${workflow} |`,
     `| Run | ${runLink} |`,
     `| Jobs included | ${estimate.jobCount} |`,
     `| Combined wall time | ${formatDuration(wallSeconds * 1000)} |`,
@@ -485,6 +507,7 @@ function renderSummary({ estimate, meta }) {
  * @param {object} input.meta
  */
 function renderComment({ estimate, meta }) {
+  const workflow = mdEscape(meta.workflow || 'This run');
   const runLink = meta.runUrl
     ? `[#${meta.runNumber || meta.runId}](${meta.runUrl})`
     : `#${meta.runNumber || meta.runId || '?'}`;
@@ -494,7 +517,7 @@ function renderComment({ estimate, meta }) {
     '',
     `**Est. ${formatUsd(estimate.estimatedUsd)}** list · **${estimate.roundedMinutes}** rounded min · **${estimate.estimatedMinutes}** included min · ${formatDuration(estimate.wallSeconds * 1000)} wall`,
     '',
-    `${meta.workflow || 'This run'} · ${runLink}`,
+    `${workflow} · ${runLink}`,
     '',
   ];
 
@@ -548,6 +571,7 @@ module.exports = {
   formatDuration,
   formatUsd,
   estimateRun,
+  mdEscape,
   renderSummary,
   renderComment,
   parseBool,
